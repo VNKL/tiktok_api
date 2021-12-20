@@ -10,7 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import datetime
+import os
 from pathlib import Path
+
+from api import prod_settings, dev_settings
+
+PRODUCTION = os.environ.get('PRODUCTION')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,18 +26,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9s3j-+7z+67lb5n&gc0l-qx0&br%zw*i*6*b2@8%=&9z+%x-_c'
+# SECRET_KEY = 'django-insecure-9s3j-+7z+67lb5n&gc0l-qx0&br%zw*i*6*b2@8%=&9z+%x-_c'
+SECRET_KEY = prod_settings.SECRET_KEY if PRODUCTION else dev_settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if not PRODUCTION else False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = prod_settings.ALLOWED_HOSTS if PRODUCTION else dev_settings.ALLOWED_HOSTS
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
-    'http://localhost:90',
-    'http://192.168.1.165:3000',
-]
+
+CORS_ORIGIN_WHITELIST = prod_settings.CORS_ORIGIN_WHITELIST if PRODUCTION else dev_settings.CORS_ORIGIN_WHITELIST
 
 
 JWT_AUTH = {
@@ -99,12 +103,7 @@ WSGI_APPLICATION = 'api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+DATABASES = prod_settings.DATABASES if PRODUCTION else dev_settings.DATABASES
 
 
 # Password validation
@@ -144,6 +143,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -151,15 +152,4 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-REST_FRAMEWORK = {
-    'PAGE_SIZE': 15,
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ]
-}
+REST_FRAMEWORK = prod_settings.REST_FRAMEWORK if PRODUCTION else dev_settings.REST_FRAMEWORK

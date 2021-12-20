@@ -15,7 +15,7 @@ DATABASES = {
     }
 }
 
-ALLOWED_HOSTS = ['.localhost', 'api', 'nginx', 'front', '77.223.106.195',
+ALLOWED_HOSTS = ['.localhost', 'api', 'nginx', 'front', '77.223.106.195', '77.223.106.194',
                  'from-shame-to-fame.ru', '.from-shame-to-fame.ru', 'www.from-shame-to-fame.ru',
                  'http://from-shame-to-fame.ru']
 
